@@ -1,26 +1,32 @@
 package br.ufs.dcomp.ChatRabbitMQ.config;
 
-import br.ufs.dcomp.ChatRabbitMQ.protBuff.MensagemProto;
+import br.ufs.dcomp.ChatRabbitMQ.utils.MessageHandler;
 import com.rabbitmq.client.*;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.TimeoutException;
 
 public class Rabbit {
 
-    private Channel channel;
+    private Channel mainChannel;
+
+    private Channel fileChannel;
 
     public Rabbit() {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setUsername("willis");
         factory.setPassword("bancodemoto");
-        factory.setHost("ec2-54-87-140-216.compute-1.amazonaws.com");
+        factory.setHost("ec2-35-175-183-128.compute-1.amazonaws.com");
         factory.setVirtualHost("/");
-
         try {
             Connection connection = factory.newConnection();
-            this.channel = connection.createChannel();
+            this.mainChannel = connection.createChannel();
+            this.fileChannel = connection.createChannel();
         } catch (IOException | TimeoutException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -28,15 +34,23 @@ public class Rabbit {
     }
 
     public void login(String username) {
-        Consumer consumer = new DefaultConsumer(this.channel) {
+        Consumer textConsumer = new DefaultConsumer(this.mainChannel) {
             public void handleDelivery(String consumerTag, Envelope envelomessagepe, AMQP.BasicProperties properties,
                                        byte[] body) throws IOException {
-                System.out.println(formatMessage(body));
+                System.out.println(MessageHandler.formatTextMessage(body));
+            }
+        };
+        Consumer binConsumer = new DefaultConsumer(this.fileChannel) {
+            public void handleDelivery(String consumerTag, Envelope envelomessagepe, AMQP.BasicProperties properties,
+                                       byte[] body) throws IOException {
+                System.out.println(MessageHandler.formatBinMessage(body));
             }
         };
         try {
-            this.channel.queueDeclare(username, false, false, false, null);
-            this.channel.basicConsume(username, true, consumer);
+            this.mainChannel.queueDeclare(username, false, false, false, null);
+            this.mainChannel.queueDeclare(username + "_bin", false, false, false, null);
+            this.mainChannel.basicConsume(username, true, textConsumer);
+            this.fileChannel.basicConsume(username + "_bin", true, binConsumer);
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -45,7 +59,7 @@ public class Rabbit {
 
     public void sendMessageToFriend(byte[] message, String friendsname) {
         try {
-            this.channel.basicPublish("", friendsname, null, message);
+            this.mainChannel.basicPublish("", friendsname, null, message);
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -54,7 +68,7 @@ public class Rabbit {
 
     public void sendMessageToGroup(byte[] message, String groupName) {
         try {
-            this.channel.basicPublish(groupName, "", null, message);
+            this.mainChannel.basicPublish(groupName, "text", null, message);
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -63,7 +77,7 @@ public class Rabbit {
 
     public void createGroup(String groupName) {
         try {
-            this.channel.exchangeDeclare(groupName, "fanout");
+            this.mainChannel.exchangeDeclare(groupName, "direct");
         } catch (IOException e) {
             // TODO Tratar exceção
             e.printStackTrace();
@@ -72,7 +86,7 @@ public class Rabbit {
 
     public void deleteGroup(String groupName) {
         try {
-            this.channel.exchangeDelete(groupName);
+            this.mainChannel.exchangeDelete(groupName);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -80,7 +94,8 @@ public class Rabbit {
 
     public void addUser(String username, String groupName) {
         try {
-            this.channel.queueBind(username, groupName, "");
+            this.mainChannel.queueBind(username, groupName, "text");
+            this.mainChannel.queueBind(username + "_bin", groupName, "binary");
         } catch (IOException e) {
             // TODO Tratar exceção
             e.printStackTrace();
@@ -89,18 +104,28 @@ public class Rabbit {
 
     public void removeUser(String username, String groupName) {
         try {
-            channel.queueUnbind(username, groupName, "");
+            this.mainChannel.queueUnbind(username, groupName, "text");
+            this.mainChannel.queueUnbind(username + "_bin", groupName, "binary");
         } catch (IOException e) {
             // TODO Tratar exceção
             e.printStackTrace();
         }
     }
 
-    private String formatMessage(byte[] buffer) throws IOException {
-        MensagemProto.Mensagem message = MensagemProto.Mensagem.parseFrom(buffer);
-        String groupName = message.getGrupo().isEmpty() ? "" : "#" + message.getGrupo();
-        return "(" + message.getData() + " às " + message.getHora() + ") " + message.getEmissor() + groupName
-                + " diz: " + new String(message.getConteudo().getCorpo().toByteArray(), StandardCharsets.UTF_8);
+    public void uploadArquivoToFriend(byte[] message, String friendsname) {
+        try {
+            this.fileChannel.basicPublish("", friendsname + "_bin", null, message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void  uploadArquivoToGroup(byte[] message, String groupName) {
+        try {
+            this.fileChannel.basicPublish(groupName, "binary", null, message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
