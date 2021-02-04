@@ -6,7 +6,6 @@ import br.ufs.dcomp.ChatRabbitMQ.estados.MensagemAmigo;
 import br.ufs.dcomp.ChatRabbitMQ.estados.MensagemGrupo;
 import br.ufs.dcomp.ChatRabbitMQ.utils.MessageHandler;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,11 +16,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @AllArgsConstructor
-public class Upload implements Runnable{
+public class Upload implements Runnable {
 
-    private Estado currentState;
-    private Rabbit rabbit;
-    private String path;
+    private final Estado currentState;
+    private final Rabbit rabbit;
+    private final String path;
 
     public void exec() {
         if (currentState.getClass() == MensagemAmigo.class) {

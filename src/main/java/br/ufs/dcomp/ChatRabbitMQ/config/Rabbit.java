@@ -3,12 +3,7 @@ package br.ufs.dcomp.ChatRabbitMQ.config;
 import br.ufs.dcomp.ChatRabbitMQ.utils.MessageHandler;
 import com.rabbitmq.client.*;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.concurrent.TimeoutException;
 
 public class Rabbit {
@@ -17,11 +12,11 @@ public class Rabbit {
 
     private Channel fileChannel;
 
-    public Rabbit() {
+    public Rabbit(String rabbitUsername, String rabbitPassword, String rabbitHost) {
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setUsername("willis");
-        factory.setPassword("bancodemoto");
-        factory.setHost("ec2-35-175-183-128.compute-1.amazonaws.com");
+        factory.setUsername(rabbitUsername);
+        factory.setPassword(rabbitPassword);
+        factory.setHost(rabbitHost);
         factory.setVirtualHost("/");
         try {
             Connection connection = factory.newConnection();
@@ -120,7 +115,7 @@ public class Rabbit {
         }
     }
 
-    public void  uploadArquivoToGroup(byte[] message, String groupName) {
+    public void uploadArquivoToGroup(byte[] message, String groupName) {
         try {
             this.fileChannel.basicPublish(groupName, "binary", null, message);
         } catch (IOException e) {

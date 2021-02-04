@@ -9,18 +9,10 @@ import br.ufs.dcomp.ChatRabbitMQ.estados.Estado;
 import br.ufs.dcomp.ChatRabbitMQ.estados.Logar;
 import br.ufs.dcomp.ChatRabbitMQ.estados.MensagemAmigo;
 import br.ufs.dcomp.ChatRabbitMQ.estados.MensagemGrupo;
-import br.ufs.dcomp.ChatRabbitMQ.utils.MessageHandler;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class App {
     public static void main(String[] args) {
-        Rabbit rabbit = new Rabbit();
+        Rabbit rabbit = new Rabbit(args[0], args[1], args[2]);
         Entrada input = new Entrada();
         Estado currentState = new Logar(rabbit);
         while (true) {
