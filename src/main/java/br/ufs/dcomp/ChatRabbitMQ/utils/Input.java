@@ -1,16 +1,16 @@
-package br.ufs.dcomp.ChatRabbitMQ.entidade;
+package br.ufs.dcomp.ChatRabbitMQ.utils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class Entrada {
+public class Input {
 
     private final Scanner input;
     private Scanner line;
     private List<String> args;
 
-    public Entrada() {
+    public Input() {
         input = new Scanner(System.in);
     }
 
@@ -20,7 +20,7 @@ public class Entrada {
      */
     public void nextLine() {
         line = new Scanner(input.nextLine());
-        args = new ArrayList<String>();
+        args = new ArrayList<>();
         while (line.hasNext()) {
             args.add(line.next());
         }
@@ -51,7 +51,7 @@ public class Entrada {
     /**
      * Retorna o comando que o usuário logado está querendo executar
      *
-     * @return
+     * @return nome do comando executado pelo usuário
      */
     public String whichCommand() {
         if (isCommand()) {
@@ -63,7 +63,8 @@ public class Entrada {
                 return args.get(0);
             }
         } else {
-            // TODO: Definir o que fazer com quando isso acontece
+            System.err.println("Não deveria ser possível chegar nessa linha. O programa será parado!");
+            System.exit(1);
             return null;
         }
     }
@@ -71,10 +72,11 @@ public class Entrada {
     /**
      * Retorna lista com os argumentos usados para executar o programa
      *
-     * @return
+     * @return Se o comando for !, retorne todos os valores seguintes ao comando. O Resto só deve retornar o valor
+     * junto do simbolo de comando
      */
     public List<String> getArguments() {
-        List<String> arguments = new ArrayList<String>(args);
+        List<String> arguments = new ArrayList<>(args);
         if (isExclamationCommand()) {
             arguments.remove(0);
         } else {

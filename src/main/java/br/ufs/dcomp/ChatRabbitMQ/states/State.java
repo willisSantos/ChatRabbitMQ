@@ -1,23 +1,23 @@
-package br.ufs.dcomp.ChatRabbitMQ.estados;
+package br.ufs.dcomp.ChatRabbitMQ.states;
 
 import br.ufs.dcomp.ChatRabbitMQ.config.Rabbit;
-import br.ufs.dcomp.ChatRabbitMQ.entidade.UsuarioLogado;
+import br.ufs.dcomp.ChatRabbitMQ.entities.LoggedUser;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
-public abstract class Estado {
+public abstract class State {
 
     protected String promptStatement;
 
     protected boolean hasCommand;
 
     @Getter
-    protected UsuarioLogado loggedUser;
+    protected LoggedUser loggedUser;
 
     protected Rabbit rabbit;
 
-    abstract public Estado action(String message, Estado currentState);
+    abstract public State action(String message);
 
     abstract public void print();
 

@@ -1,10 +1,10 @@
-package br.ufs.dcomp.ChatRabbitMQ.entidade;
+package br.ufs.dcomp.ChatRabbitMQ.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class Grupo {
+public class Group {
     private final String name;
 }

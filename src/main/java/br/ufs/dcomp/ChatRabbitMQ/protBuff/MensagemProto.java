@@ -63,6 +63,7 @@ public final class MensagemProto {
     getDescriptor() {
         return descriptor;
     }
+
     public interface MensagemOrBuilder extends
             // @@protoc_insertion_point(interface_extends:ChatRabbitMQ.protBuff.Mensagem)
             com.google.protobuf.MessageOrBuilder {
@@ -237,6 +238,7 @@ public final class MensagemProto {
             hora_ = "";
             grupo_ = "";
         }
+
         private Mensagem(
                 com.google.protobuf.CodedInputStream input,
                 com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1477,6 +1479,7 @@ public final class MensagemProto {
             corpo_ = com.google.protobuf.ByteString.EMPTY;
             nome_ = "";
         }
+
         private Conteudo(
                 com.google.protobuf.CodedInputStream input,
                 com.google.protobuf.ExtensionRegistryLite extensionRegistry)
