@@ -1,6 +1,7 @@
 package br.ufs.dcomp.ChatRabbitMQ.commands;
 
 import br.ufs.dcomp.ChatRabbitMQ.config.Rabbit;
+import br.ufs.dcomp.ChatRabbitMQ.states.Idle;
 import br.ufs.dcomp.ChatRabbitMQ.states.State;
 
 import java.io.IOException;
@@ -37,6 +38,6 @@ public class DeleteGroup extends Command {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return currentState;
+        return new Idle(currentState.getLoggedUser(), rabbit);
     }
 }

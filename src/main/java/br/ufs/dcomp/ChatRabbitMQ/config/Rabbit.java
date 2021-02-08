@@ -106,20 +106,12 @@ public class Rabbit {
         this.mainChannel.queueUnbind(username + queueSuffix, groupName, binaryRoutingKey);
     }
 
-    public void uploadArquivoToFriend(byte[] message, String friendsname) {
-        try {
-            this.fileChannel.basicPublish("", friendsname + queueSuffix, null, message);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void uploadArquivoToFriend(byte[] message, String friendsname) throws IOException {
+        this.fileChannel.basicPublish("", friendsname + queueSuffix, null, message);
     }
 
-    public void uploadArquivoToGroup(byte[] message, String groupName) {
-        try {
-            this.fileChannel.basicPublish(groupName, binaryRoutingKey, null, message);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void uploadArquivoToGroup(byte[] message, String groupName) throws IOException {
+        this.fileChannel.basicPublish(groupName, binaryRoutingKey, null, message);
     }
 
     private String sendHttpRequest(String path) throws IOException, InterruptedException {
